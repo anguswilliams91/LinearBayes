@@ -1,6 +1,5 @@
 from __future__ import division
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
 from scipy.optimize import minimize
 import os
@@ -9,7 +8,7 @@ from bayes_triangle import triangle_plot
 
 """This code will fit a straight line with intrinsic dispersion to data with (optionally) covariant 
 errors on both the independent and dependent variables, and takes care of outliers using a mixture 
-model approach. Requires packages numpy,scipy and emcee.
+model approach. Requires packages numpy,scipy,emcee and matplotlib. 
 
 The main function is fit_data, which does the fitting and returns the results (and optionally makes a 
 corner-plot.
