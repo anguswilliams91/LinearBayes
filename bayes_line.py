@@ -69,7 +69,7 @@ def outlier_distribution(params,data):
                 Try transposing your data.".format(data.shape[1]))
     y_outlier,sigma_outlier = params
     sigma_total2 = sigma_outlier**2.+dy**2.
-    return (2.*np.pi*sigma_total2)**-0.5 * np.exp(-.5*(y-y_outlier)**2./ (2.*sigma_total2))
+    return (2.*np.pi*sigma_total2)**-0.5 * np.exp(-.5*(y-y_outlier)**2./sigma_total2)
 
 def full_log_likelihood(params,data):
     """The log-likelihood of the data given the full mixture model of the linear function & \
