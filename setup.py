@@ -7,5 +7,5 @@ setup(name='linear_bayes',
       author='Angus Williams',
       author_email='anguswilliams91@gmail.com',
       license='MIT',
-      packages=['funniest'],
+      packages=['linear_bayes'],
       zip_safe=False)

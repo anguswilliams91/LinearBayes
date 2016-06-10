@@ -1,14 +1,14 @@
 # LinearBayes
 
-A python implementation of the Bayesian approach to fitting a straight 
+A simple [`python`] implementation of the Bayesian approach to fitting a straight 
 line to two-dimensional data with covariant errors on the two coordinates. 
 Depends on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
 Clone the repo, and then run
 
-python bayes_line.py
+`python setup.py install`
 
-to generate some mock data and fit it.
+to install the module.
 
 Example code:
 
