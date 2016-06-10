@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
 from scipy.stats import multivariate_normal
 from scipy.optimize import minimize
@@ -138,7 +138,7 @@ def full_posterior(params,data,priorlimits):
         return log_priors(params,priorlimits)+full_log_likelihood(params,data)
 
 def mock_data():
-    """Generate a mock sample of 30 + a few data points with errors to test the \
+    """Generate a mock sample of 20 + a few data points with errors to test the \
     fitting machinery.
     Args:
         This function takes no arguments.
@@ -147,7 +147,7 @@ def mock_data():
         (2) np.ndarray params. The parameters of the model.
     """
     #generate random slope and intercept
-    ndata = 30
+    ndata = 20
     slope = np.float(np.random.uniform(1.,4.,1))
     intercept = np.float(np.random.uniform(-3.,3.,1))
     sigma_intrinsic = np.float(np.random.uniform(0.1,.3,1))
@@ -166,13 +166,13 @@ def mock_data():
     dxy = rho*dx*dy #off-diagonal terms
     #now scatter xp and yp by these errors
     x,y = np.zeros_like(xp),np.zeros_like(xp)
-    for i in np.arange(30):
+    for i in np.arange(ndata):
         cov = [[dx[i]**2.,rho[i]*dx[i]*dy[i]],[rho[i]*dx[i]*dy[i],dy[i]**2.]]
         mean = [xp[i],yp[i]]
         xi,yi = np.random.multivariate_normal(mean,cov,1).T
         x[i],y[i] = np.float(xi),np.float(yi)
     #now generate a few outliers
-    sigma_outlier = np.float(np.random.uniform(1.,2.,1))
+    sigma_outlier = np.float(np.random.uniform(10.,100.,1))
     y_mean = np.float(np.random.uniform(-10.,10.,1))
     noutlier=np.int(np.random.randint(2,high=5,size=1))
     y_outlier = np.random.normal(loc=y_mean,scale=sigma_outlier,size=noutlier)
@@ -185,7 +185,7 @@ def mock_data():
     dx=np.append(dx,dx_outlier)
     dy=np.append(dy,dy_outlier)
     dxy = np.append(dxy,rho_outlier*dx_outlier*dy_outlier)
-    return np.vstack((x,y,dx,dy,dxy)).T,np.array([slope,intercept,sigma_intrinsic,y_mean,sigma_outlier,noutlier/(noutlier+100)])
+    return np.vstack((x,y,dx,dy,dxy)).T,np.array([slope,intercept,sigma_intrinsic,y_mean,sigma_outlier,noutlier/(noutlier+ndata)])
 
 def write_to_file(sampler,outfile,p0,Nsteps=10):
     """Write an MCMC chain from emcee to a file.
