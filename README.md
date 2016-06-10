@@ -33,5 +33,5 @@ ax.set_ylabel("$y$")
 ax.legend(loc='upper left')
 ```
 
-![Alt text](example.png?raw=true)
+![Alt text](example_fit.png?raw=true)
 ![Alt text](example_triangle.png?raw=true)
