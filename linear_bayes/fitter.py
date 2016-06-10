@@ -260,9 +260,12 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
             (x,y,dx,dy) or (x,y,dx,dy,dxy).
         (2) np.ndarray or list, guess. A guess of the 6 model parameters. If not included \
             then a fixed starting guess will be used (which may well be inappropriate and \
-            break everything!)
+            break everything!). Ordered as [slope,intercept,intrinsic_scatter,outlier_mean,\
+            outlier_scatter,outlier_fraction].
         (3) np.ndarray, priorlimits. Upper and lower values for each of the model parameters \
-            (except the outlier fraction which has a flat prior between 0 and 1). 
+            (except the outlier fraction which has a flat prior between 0 and 1). The limits should \
+            be provided in the order [slope,intercept,intrinsic_scatter,outlier_mean,\
+            outlier_scatter] (so that the array has 10 elements).
         (4) nwalkers (= 50), the number of emcee walkers to use in the fit.
         (5) nsteps (= 5000), the number of steps each walker should take in the MCMC.
         (6) nproc (= 8), the number of threads to use for parallelisation.
@@ -273,7 +276,7 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
             will be saved for you to analyse (e.g. with a corner plot).
     Returns:
         (1) results, for each parameter a tuple is returned (best_fit, +err, -err) (assuming 20 per cent burn-in time), \
-            in the order (slope, intercept, intrinsic scatter, outlier mean, outlier deviation, outlier.
+            in the order (slope, intercept, intrinsic scatter, outlier mean, outlier deviation, outlier fraction).
     """
     #first make some guesses at the values for things, this could be massively improved and will probably break sometimes.
     x,y = data[:,:2].T
