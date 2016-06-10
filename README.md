@@ -1,8 +1,9 @@
 # LinearBayes
 
 A simple `python 2` implementation of the Bayesian approach to fitting a straight 
-line to two-dimensional data with covariant errors on the two coordinates and some outliers. 
-Depends on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
+line to two-dimensional data with covariant errors on the two coordinates and some outliers 
+(see e.g. [Hogg, Bovy & Lang (2010)](http://arxiv.org/abs/1008.4686) for discussion). Depends 
+on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
 Clone the repo, and then run
 
