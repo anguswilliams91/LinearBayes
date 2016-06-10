@@ -148,12 +148,12 @@ def mock_data():
     """
     #generate random slope and intercept
     ndata = 20
-    slope = np.float(np.random.uniform(1.,4.,1))
-    intercept = np.float(np.random.uniform(-3.,3.,1))
-    sigma_intrinsic = np.float(np.random.uniform(0.1,.3,1))
+    slope = np.random.uniform(low=1.,high=4.,size=1)
+    intercept = np.random.uniform(low=-3.,high=3.)
+    sigma_intrinsic = np.random.uniform(low=0.1,high=.3)
     theta = np.arctan(slope)
     #generate coordinates along the line with random intrinsic spread
-    gamma = np.random.uniform(1.,20.,ndata)
+    gamma = np.random.uniform(low=1.,high=20.,size=ndata)
     delta = np.random.normal(loc=0.,scale=sigma_intrinsic,size=ndata)
     #now transform to x and y
     sint,cost = np.sin(theta),np.cos(theta)
@@ -172,14 +172,14 @@ def mock_data():
         xi,yi = np.random.multivariate_normal(mean,cov,1).T
         x[i],y[i] = np.float(xi),np.float(yi)
     #now generate a few outliers
-    sigma_outlier = np.float(np.random.uniform(10.,100.,1))
-    y_mean = np.float(np.random.uniform(-10.,10.,1))
-    noutlier=np.int(np.random.randint(2,high=5,size=1))
+    sigma_outlier = np.random.uniform(low=10.,high=100.)
+    y_mean = np.random.uniform(low=-10.,high=10.)
+    noutlier=np.random.randint(low=2,high=5)
     y_outlier = np.random.normal(loc=y_mean,scale=sigma_outlier,size=noutlier)
     x_outlier = np.random.uniform(low=1.3*np.min(x),high=1.3*np.max(x),size=noutlier)
     dx_outlier = np.abs(np.random.normal(loc=0.,scale=0.3,size=noutlier))
     dy_outlier = np.abs(np.random.normal(loc=0.,scale=0.3,size=noutlier)) #don't bother scattering through these (lazy)
-    rho_outlier = np.random.uniform(-1.,1.,noutlier)
+    rho_outlier = np.random.uniform(low=-1.,high=1.,size=noutlier)
     x =np.append(x,x_outlier)
     y=np.append(y,y_outlier)
     dx=np.append(dx,dx_outlier)
@@ -291,17 +291,17 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
     #now use a minimization routine to find the max-posterior point
     def minfun(params):
         return -full_posterior(params,data,priorlimits)
-    print "Running optimization..."
+    print("Running optimization...")
     pstart = minimize(minfun,guess,method="Nelder-Mead",options={'maxfev':1e6}).x
-    print "found point {}".format(pstart)
+    print("found point {}".format(pstart))
     #make a blob at the max posterior point
     p0 = emcee.utils.sample_ball(pstart,0.01*np.ones_like(pstart),size=nwalkers)
     p0[:,-1] = np.abs(p0[:,-1]) #make sure no negative outlier fractions
     #sampler
     sampler = emcee.EnsembleSampler(nwalkers,6,full_posterior,args=[data,priorlimits],threads=nproc) #the sampler
-    print "running fits..."
+    print("running fits...")
     write_to_file(sampler,outfile+".temp",p0,Nsteps=nsteps)
-    print "done!"
+    print("done!")
     chain = np.genfromtxt(outfile+".temp")
     if make_cornerplot: 
         labels = ["$m$","$b$","$\\sigma_\\mathrm{in}$","$y_\\mathrm{out}$","$\\log_{10}\\sigma_\\mathrm{out}$","$f_\\mathrm{outlier}$"]
@@ -398,10 +398,6 @@ def triangle_plot( chain, axis_labels=None, fname = None, nbins=40, filled=True,
     plot_width = 15.
     plot_height = 15.
     axis_space = 0.05
-
-    if len(traces) != len(axis_labels):
-        print >> stderr, "ERROR: There must be the same number of axis labels as traces"
-        return
 
     if truths != None and ( len(truths) != len(traces) ):
         print >> stderr, "ERROR: There must be the same number of true values as traces"
