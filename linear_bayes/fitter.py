@@ -251,22 +251,25 @@ def chain_results(chain,burnin=None):
     return np.array(map(lambda v: [v[1],v[2]-v[1],v[1]-v[0]],\
                 zip(*np.percentile(chain[:,1:],[16,50,84],axis=0))))
 
-def fit_data(data,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,0.001,1000.],nwalkers=50,nsteps=5000\
+def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,0.001,1000.],nwalkers=50,nsteps=5000\
     ,nproc=8,outfile="line_fit_chain",make_cornerplot=True,truths=None,delete_output=True):
     """Fit the model to data using emcee. An optimization routine from scipy is first used to 
     Args:
         (1) np.ndarray, data. Should have shape (N,4) (if no covariances on \
             errors) or (N,5) (if covariant errors). Should be in the order \
             (x,y,dx,dy) or (x,y,dx,dy,dxy).
-        (2) np.ndarray, priorlimits. Upper and lower values for each of the model parameters \
+        (2) np.ndarray or list, guess. A guess of the 6 model parameters. If not included \
+            then a fixed starting guess will be used (which may well be inappropriate and \
+            break everything!)
+        (3) np.ndarray, priorlimits. Upper and lower values for each of the model parameters \
             (except the outlier fraction which has a flat prior between 0 and 1). 
-        (3) nwalkers (= 50), the number of emcee walkers to use in the fit.
-        (4) nsteps (= 5000), the number of steps each walker should take in the MCMC.
-        (5) nproc (= 8), the number of threads to use for parallelisation.
-        (6) outfile (= "line_fit.dat"), the file to which the points in the MCMC chain will be written.
-        (7) make_cornerplot (= True), make a corner plot and save it if True.
-        (8) truths (= None), if you know the right answer, plot it on the corner plot.
-        (9) delete_output (= True), if True, delete the text file that stores the chain. If not, the results \
+        (4) nwalkers (= 50), the number of emcee walkers to use in the fit.
+        (5) nsteps (= 5000), the number of steps each walker should take in the MCMC.
+        (6) nproc (= 8), the number of threads to use for parallelisation.
+        (7) outfile (= "line_fit.dat"), the file to which the points in the MCMC chain will be written.
+        (8) make_cornerplot (= True), make a corner plot and save it if True.
+        (9) truths (= None), if you know the right answer, plot it on the corner plot.
+        (10) delete_output (= True), if True, delete the text file that stores the chain. If not, the results \
             will be saved for you to analyse (e.g. with a corner plot).
     Returns:
         (1) results, for each parameter a tuple is returned (best_fit, +err, -err) (assuming 20 per cent burn-in time), \
@@ -274,17 +277,19 @@ def fit_data(data,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,0.001,1000.
     """
     #first make some guesses at the values for things, this could be massively improved and will probably break sometimes.
     x,y = data[:,:2].T
-    mguess = 2.
-    bguess = 0.
-    sig_guess = 2.
-    y_outlier_guess = 0.
-    sig_outlier_guess = 30.
-    pguess = [mguess,bguess,sig_guess,y_outlier_guess,sig_outlier_guess,0.01]
+    if guess is None:
+        #not recommended as will probably break!
+        mguess = 2.
+        bguess = 0.
+        sig_guess = 2.
+        y_outlier_guess = 0.
+        sig_outlier_guess = 30.
+        guess = [mguess,bguess,sig_guess,y_outlier_guess,sig_outlier_guess,0.01]
     #now use a minimization routine to find the max-posterior point
     def minfun(params):
         return -full_posterior(params,data,priorlimits)
     print "Running optimization..."
-    pstart = minimize(minfun,pguess,method="Nelder-Mead",options={'maxfev':1e6}).x
+    pstart = minimize(minfun,guess,method="Nelder-Mead",options={'maxfev':1e6}).x
     print "found point {}".format(pstart)
     #make a blob at the max posterior point
     p0 = emcee.utils.sample_ball(pstart,0.01*np.ones_like(pstart),size=nwalkers)
