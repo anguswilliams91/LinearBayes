@@ -19,7 +19,8 @@ import linear_bayes
 
 #generate some mock data and fit it
 data,true_parameters = linear_bayes.mock_data()
-results = linear_bayes.fit_data(data,guess=true_parameters,outfile="trial_fit",make_cornerplot=True,truths=true_parameters) 
+results = linear_bayes.fit_data(data,guess=true_parameters,outfile="trial_fit",make_cornerplot=True,\
+								truths=true_parameters) 
 
 #make a plot of the inference vs. data
 x = np.linspace(np.min(data[:,0]),np.max(data[:,0]))
