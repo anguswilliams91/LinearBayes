@@ -138,7 +138,7 @@ def full_posterior(params,data,priorlimits):
         return log_priors(params,priorlimits)+full_log_likelihood(params,data)
 
 def mock_data():
-    """Generate a mock sample of 100 + a few data points with errors to test the \
+    """Generate a mock sample of 30 + a few data points with errors to test the \
     fitting machinery.
     Args:
         This function takes no arguments.
@@ -147,25 +147,26 @@ def mock_data():
         (2) np.ndarray params. The parameters of the model.
     """
     #generate random slope and intercept
+    ndata = 30
     slope = np.float(np.random.uniform(1.,4.,1))
     intercept = np.float(np.random.uniform(-3.,3.,1))
     sigma_intrinsic = np.float(np.random.uniform(0.1,.3,1))
     theta = np.arctan(slope)
     #generate coordinates along the line with random intrinsic spread
-    gamma = np.random.uniform(1.,20.,100)
-    delta = np.random.normal(loc=0.,scale=sigma_intrinsic,size=100)
+    gamma = np.random.uniform(1.,20.,ndata)
+    delta = np.random.normal(loc=0.,scale=sigma_intrinsic,size=ndata)
     #now transform to x and y
     sint,cost = np.sin(theta),np.cos(theta)
     xp = cost*gamma - sint*delta 
     yp = sint*gamma + cost*delta + intercept
     #now generate x and y errors
-    dx = np.abs(np.random.normal(loc=0.,scale=0.3,size=100))
-    dy = np.abs(np.random.normal(loc=0.,scale=0.3,size=100))
-    rho = np.random.uniform(-1.,1.,size=100) #correlation parameters
+    dx = np.abs(np.random.normal(loc=0.,scale=0.3,size=ndata))
+    dy = np.abs(np.random.normal(loc=0.,scale=0.3,size=ndata))
+    rho = np.random.uniform(-1.,1.,size=ndata) #correlation parameters
     dxy = rho*dx*dy #off-diagonal terms
     #now scatter xp and yp by these errors
     x,y = np.zeros_like(xp),np.zeros_like(xp)
-    for i in np.arange(100):
+    for i in np.arange(30):
         cov = [[dx[i]**2.,rho[i]*dx[i]*dy[i]],[rho[i]*dx[i]*dy[i],dy[i]**2.]]
         mean = [xp[i],yp[i]]
         xi,yi = np.random.multivariate_normal(mean,cov,1).T
