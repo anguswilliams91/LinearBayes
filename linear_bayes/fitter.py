@@ -148,12 +148,12 @@ def mock_data():
     """
     #generate random slope and intercept
     ndata = 20
-    slope = np.random.uniform(low=1.,high=4.,size=1)
+    slope = np.random.uniform(low=.1,high=1.5,size=1)
     intercept = np.random.uniform(low=-3.,high=3.)
     sigma_intrinsic = np.random.uniform(low=0.1,high=.3)
     theta = np.arctan(slope)
     #generate coordinates along the line with random intrinsic spread
-    gamma = np.random.uniform(low=1.,high=20.,size=ndata)
+    gamma = np.random.uniform(low=1.,high=15.,size=ndata)
     delta = np.random.normal(loc=0.,scale=sigma_intrinsic,size=ndata)
     #now transform to x and y
     sint,cost = np.sin(theta),np.cos(theta)
@@ -161,7 +161,7 @@ def mock_data():
     yp = sint*gamma + cost*delta + intercept
     #now generate x and y errors
     dx = np.abs(np.random.normal(loc=0.,scale=0.3,size=ndata))
-    dy = np.abs(np.random.normal(loc=0.,scale=0.3,size=ndata))
+    dy = np.abs(np.random.normal(loc=0.,scale=0.3*slope,size=ndata))
     rho = np.random.uniform(-1.,1.,size=ndata) #correlation parameters
     dxy = rho*dx*dy #off-diagonal terms
     #now scatter xp and yp by these errors
@@ -172,8 +172,8 @@ def mock_data():
         xi,yi = np.random.multivariate_normal(mean,cov,1).T
         x[i],y[i] = np.float(xi),np.float(yi)
     #now generate a few outliers
-    sigma_outlier = np.random.uniform(low=10.,high=100.)
-    y_mean = np.random.uniform(low=-10.,high=10.)
+    sigma_outlier = np.random.uniform(low=5.,high=10.)
+    y_mean = np.mean(y)
     noutlier=np.random.randint(low=2,high=5)
     y_outlier = np.random.normal(loc=y_mean,scale=sigma_outlier,size=noutlier)
     x_outlier = np.random.uniform(low=1.3*np.min(x),high=1.3*np.max(x),size=noutlier)
@@ -304,9 +304,9 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
     print("done!")
     chain = np.genfromtxt(outfile+".temp")
     if make_cornerplot: 
-        labels = ["$m$","$b$","$\\sigma_\\mathrm{in}$","$y_\\mathrm{out}$","$\\log_{10}\\sigma_\\mathrm{out}$","$f_\\mathrm{outlier}$"]
         chainplot = np.copy(chain)
         chainplot[:,5] = np.log10(chainplot[:,5])
+        labels = ["$m$","$b$","$\\sigma_\\mathrm{in}$","$y_\\mathrm{out}$","$\\log_{10}\\sigma_\\mathrm{out}$","$f_\\mathrm{outlier}$"]
         if truths is not None: 
             truths[4] = np.log10(truths[4])
             triangle_plot(chainplot,burnin=np.int(0.2*nsteps),axis_labels=labels,fname=outfile+"_corner.pdf",truths=truths)
