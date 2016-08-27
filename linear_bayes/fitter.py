@@ -349,6 +349,7 @@ def confidence_2d(xsamples,ysamples,ax=None,intervals=None,nbins=20,linecolor='k
             v[i] = h[sm <= v0][-1]
         except:
             v[i] = h[0]
+    v=v[::-1]
 
     xc = np.array([.5*(xedges[i]+xedges[i+1]) for i in np.arange(nbins)]) #bin centres
     yc = np.array([.5*(yedges[i]+yedges[i+1]) for i in np.arange(nbins)])
