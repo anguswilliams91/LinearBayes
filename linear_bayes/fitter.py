@@ -361,7 +361,7 @@ def confidence_2d(xsamples,ysamples,ax=None,intervals=None,nbins=20,linecolor='k
             plt.hist2d(xsamples,ysamples,bins=nbins,cmap=cmap)
             plt.contour(xx,yy,H,levels=v,colors=linecolor,extend='max',linewidths=linewidth)
         elif filled:
-            plt.contourf(xx,yy,H,levels=v[::-1],cmap=cmap)
+            plt.contourf(xx,yy,H,levels=v,cmap=cmap)
         else:
             plt.contour(xx,yy,H,levels=v,colors=linecolor,linewidths=linewidth)
     else:
@@ -369,7 +369,7 @@ def confidence_2d(xsamples,ysamples,ax=None,intervals=None,nbins=20,linecolor='k
             ax.hist2d(xsamples,ysamples,bins=nbins,cmap=cmap)
             ax.contour(xx,yy,H,levels=v,colors=linecolor,extend='max',linewidths=linewidth)
         elif filled:
-            ax.contourf(xx,yy,H,levels=v[::-1],cmap=cmap)
+            ax.contourf(xx,yy,H,levels=v,cmap=cmap)
             ax.contour(xx,yy,H,levels=v,colors=linecolor,extend='max',linewidths=linewidth)
         else:
             ax.contour(xx,yy,H,levels=v,colors=linecolor,linewidths=linewidth)        
