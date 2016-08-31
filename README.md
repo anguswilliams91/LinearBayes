@@ -5,9 +5,9 @@ line to two-dimensional data with covariant errors on the two coordinates and so
 (see e.g. [Hogg, Bovy & Lang (2010)](http://arxiv.org/abs/1008.4686) for discussion). Depends 
 on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
-Clone the repo, and then run
+Download the tarball and then run
 
-`python setup.py install`
+`pip install LinearBayes-master.tar.gz`
 
 to install the module.
 
