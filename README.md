@@ -21,5 +21,5 @@ lb.mock_test(nproc=8) #run the test case and parallelise over 8 threads
 
 ```
 
-![Alt text](example_fit.png?raw=true)
-![Alt text](example_triangle.png?raw=true)
+![Alt text](mock_fit.png?raw=true)
+![Alt text](mock_triangle.png?raw=true)
