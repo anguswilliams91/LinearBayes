@@ -1,9 +1,11 @@
 from __future__ import division, print_function
+
 import numpy as np
 from scipy.stats import multivariate_normal
 from scipy.optimize import minimize
 import os
 import emcee
+import warnings
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -15,6 +17,8 @@ import matplotlib.cm as cm
 import matplotlib.colorbar as cbar
 import pylab
 import matplotlib.colors as colors
+
+warnings.filterwarnings("ignore") #sorry
 
 """This code will fit a straight line with intrinsic dispersion to data with (optionally) covariant 
 errors on both the independent and dependent variables, and takes care of outliers using a mixture 
@@ -137,56 +141,6 @@ def full_posterior(params,data,priorlimits):
     else:
         return log_priors(params,priorlimits)+full_log_likelihood(params,data)
 
-def mock_data():
-    """Generate a mock sample of 20 + a few data points with errors to test the \
-    fitting machinery.
-    Args:
-        This function takes no arguments.
-    Returns:
-        (1) np.ndarray data. A mock data-set with (x,y,dx,dy,dxy) as the columns.
-        (2) np.ndarray params. The parameters of the model.
-    """
-    #generate random slope and intercept
-    ndata = 20
-    slope = np.random.uniform(low=.1,high=1.5,size=1)
-    intercept = np.random.uniform(low=-3.,high=3.)
-    sigma_intrinsic = np.random.uniform(low=0.1,high=.3)
-    theta = np.arctan(slope)
-    #generate coordinates along the line with random intrinsic spread
-    gamma = np.random.uniform(low=1.,high=15.,size=ndata)
-    delta = np.random.normal(loc=0.,scale=sigma_intrinsic,size=ndata)
-    #now transform to x and y
-    sint,cost = np.sin(theta),np.cos(theta)
-    xp = cost*gamma - sint*delta 
-    yp = sint*gamma + cost*delta + intercept
-    #now generate x and y errors
-    dx = np.abs(np.random.normal(loc=0.,scale=0.3,size=ndata))
-    dy = np.abs(np.random.normal(loc=0.,scale=0.3*slope,size=ndata))
-    rho = np.random.uniform(-1.,1.,size=ndata) #correlation parameters
-    dxy = rho*dx*dy #off-diagonal terms
-    #now scatter xp and yp by these errors
-    x,y = np.zeros_like(xp),np.zeros_like(xp)
-    for i in np.arange(ndata):
-        cov = [[dx[i]**2.,rho[i]*dx[i]*dy[i]],[rho[i]*dx[i]*dy[i],dy[i]**2.]]
-        mean = [xp[i],yp[i]]
-        xi,yi = np.random.multivariate_normal(mean,cov,1).T
-        x[i],y[i] = np.float(xi),np.float(yi)
-    #now generate a few outliers
-    sigma_outlier = np.random.uniform(low=5.,high=10.)
-    y_mean = np.mean(y)
-    noutlier=np.random.randint(low=2,high=5)
-    y_outlier = np.random.normal(loc=y_mean,scale=sigma_outlier,size=noutlier)
-    x_outlier = np.random.uniform(low=1.3*np.min(x),high=1.3*np.max(x),size=noutlier)
-    dx_outlier = np.abs(np.random.normal(loc=0.,scale=0.3,size=noutlier))
-    dy_outlier = np.abs(np.random.normal(loc=0.,scale=0.3,size=noutlier)) #don't bother scattering through these (lazy)
-    rho_outlier = np.random.uniform(low=-1.,high=1.,size=noutlier)
-    x =np.append(x,x_outlier)
-    y=np.append(y,y_outlier)
-    dx=np.append(dx,dx_outlier)
-    dy=np.append(dy,dy_outlier)
-    dxy = np.append(dxy,rho_outlier*dx_outlier*dy_outlier)
-    return np.vstack((x,y,dx,dy,dxy)).T,np.array([slope,intercept,sigma_intrinsic,y_mean,sigma_outlier,noutlier/(noutlier+ndata)])
-
 def write_to_file(sampler,outfile,p0,Nsteps=10):
     """Write an MCMC chain from emcee to a file.
     Args:
@@ -253,18 +207,18 @@ def chain_results(chain,burnin=None):
 
 def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,0.001,1000.],nwalkers=50,nsteps=5000\
     ,nproc=8,outfile="line_fit_chain",make_cornerplot=True,truths=None,delete_output=True):
-    """Fit the model to data using emcee. An optimization routine from scipy is first used to 
+    """
     Args:
-        (1) np.ndarray, data. Should have shape (N,4) (if no covariances on \
-            errors) or (N,5) (if covariant errors). Should be in the order \
+        (1) np.ndarray, data. Should have shape (N,4) (if no covariances on 
+            errors) or (N,5) (if covariant errors). Should be in the order 
             (x,y,dx,dy) or (x,y,dx,dy,dxy).
-        (2) np.ndarray or list, guess. A guess of the 6 model parameters. If not included \
-            then a fixed starting guess will be used (which may well be inappropriate and \
-            break everything!). Ordered as [slope,intercept,intrinsic_scatter,outlier_mean,\
+        (2) np.ndarray or list, guess. A guess of the 6 model parameters. If not included 
+            then a fixed starting guess will be used (which may well be inappropriate and 
+            break everything!). Ordered as [slope,intercept,intrinsic_scatter,outlier_mean,
             outlier_scatter,outlier_fraction].
-        (3) np.ndarray, priorlimits. Upper and lower values for each of the model parameters \
-            (except the outlier fraction which has a flat prior between 0 and 1). The limits should \
-            be provided in the order [slope,intercept,intrinsic_scatter,outlier_mean,\
+        (3) np.ndarray, priorlimits. Upper and lower values for each of the model parameters 
+            (except the outlier fraction which has a flat prior between 0 and 1). The limits should 
+            be provided in the order [slope,intercept,intrinsic_scatter,outlier_mean,
             outlier_scatter] (so that the array has 10 elements).
         (4) nwalkers (= 50), the number of emcee walkers to use in the fit.
         (5) nsteps (= 5000), the number of steps each walker should take in the MCMC.
@@ -272,10 +226,10 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
         (7) outfile (= "line_fit.dat"), the file to which the points in the MCMC chain will be written.
         (8) make_cornerplot (= True), make a corner plot and save it if True.
         (9) truths (= None), if you know the right answer, plot it on the corner plot.
-        (10) delete_output (= True), if True, delete the text file that stores the chain. If not, the results \
+        (10) delete_output (= True), if True, delete the text file that stores the chain. If not, the results 
             will be saved for you to analyse (e.g. with a corner plot).
     Returns:
-        (1) results, for each parameter a tuple is returned (best_fit, +err, -err) (assuming 20 per cent burn-in time), \
+        (1) results, for each parameter a tuple is returned (best_fit, +err, -err) (assuming 10 per cent burn-in time), 
             in the order (slope, intercept, intrinsic scatter, outlier mean, outlier deviation, outlier fraction).
     """
     #first make some guesses at the values for things, this could be massively improved and will probably break sometimes.
@@ -305,20 +259,32 @@ def fit_data(data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,
     chain = np.genfromtxt(outfile+".temp")
     if make_cornerplot: 
         chainplot = np.copy(chain)
-        chainplot[:,5] = np.log10(chainplot[:,5])
-        labels = ["$m$","$b$","$\\sigma_\\mathrm{in}$","$y_\\mathrm{out}$","$\\log_{10}\\sigma_\\mathrm{out}$","$f_\\mathrm{outlier}$"]
+        labels = ["$m$","$b$","$\\sigma_\\mathrm{in}$"]
         if truths is not None: 
-            truths[4] = np.log10(truths[4])
-            triangle_plot(chainplot,burnin=np.int(0.2*nsteps),axis_labels=labels,fname=outfile+"_corner.pdf",truths=truths)
+            triangle_plot(chainplot[:,:4],burnin=np.int(0.1*nsteps),axis_labels=labels,fname=outfile+"_corner.pdf",truths=truths)
         else:
-            triangle_plot(chainplot,burnin=np.int(0.2*nsteps),axis_labels=labels,fname=outfile+"_corner.pdf",truths=truths)
+            triangle_plot(chainplot[:,:4],burnin=np.int(0.1*nsteps),axis_labels=labels,fname=outfile+"_corner.pdf",truths=truths)
         del chainplot
-    results = chain_results(chain,burnin=np.int(0.2*nsteps))
+    results = chain_results(chain,burnin=np.int(0.1*nsteps))
     mcmc_chain = reshape_chain(chain)
     if not delete_output:
         np.save(outfile,mcmc_chain)
     os.remove(outfile+".temp")
     return results
+
+def mock_test(nproc=8):
+    """Fit mock data to check everything is working"""
+    fake_data = np.load(os.path.join(os.path.dirname(__file__),"data","mock_data.npy"))
+    res = fit_data(fake_data,guess=None,priorlimits=[-10.,10.,-10.,10.,0.001,100.,-10.,10.,0.001,1000.],nwalkers=50,nsteps=7000\
+    ,nproc=nproc,outfile="line_fit_chain",make_cornerplot=True,truths=None,delete_output=True)
+    fig,ax = plt.subplots()
+    x = np.linspace(np.min(fake_data[:,0]),np.max(fake_data[:,0]))
+    ax.plot(x,res[0,0]*x+res[1,0],c='k',lw=3,label="fit")
+    ax.errorbar(fake_data[:,0],fake_data[:,1],xerr=fake_data[:,2],yerr=fake_data[:,3],fmt="none",ecolor='0.5',label="mock data",zorder=0)
+    ax.set_xlabel("$x$")
+    ax.set_ylabel("$y$")
+    ax.legend(loc='lower right',numpoints=1)
+    return None
 
 def my_formatter(x, pos):
     """Format 1 as 1, 0 as 0, and all values whose absolute values is between
