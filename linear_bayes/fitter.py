@@ -22,12 +22,7 @@ warnings.filterwarnings("ignore") #sorry
 
 """This code will fit a straight line with intrinsic dispersion to data with (optionally) covariant 
 errors on both the independent and dependent variables, and takes care of outliers using a mixture 
-model approach. Requires packages numpy,scipy,emcee and matplotlib. 
-
-The main function is fit_data, which does the fitting and returns the results (and optionally makes a 
-corner-plot.
-
-There is a main() function so type "python bayes_line.py" to generate some mock data and then fit it.
+model approach. Requires packages numpy,scipy,emcee and matplotlib.
 """
 
 def likelihood_line(params,data):
