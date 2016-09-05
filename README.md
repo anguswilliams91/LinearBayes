@@ -5,34 +5,20 @@ line to two-dimensional data with covariant errors on the two coordinates and so
 (see e.g. [Hogg, Bovy & Lang (2010)](http://arxiv.org/abs/1008.4686) for discussion). Depends 
 on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
-Clone the repo, and then run
+To install using `pip`, download the zipped repo and run
 
-`python setup.py install`
+`pip install LinearBayes-master.zip`
 
-to install the module.
+to install the module (and any dependicies which aren't already installed). The function that 
+does all of the work is called `fit_data` and has an explanatory docstring.
 
-Example code:
+Example snippet, which runs a test on some mock data and produces two plots (shown below):
 
 ```python
-import matplotlib.pyplot as plt
-import numpy as np
-import linear_bayes
+import linear_bayes as lb
 
-#generate some mock data and fit it
-data,true_parameters = linear_bayes.mock_data()
-results = linear_bayes.fit_data(data,guess=true_parameters,outfile="trial_fit",make_cornerplot=True,\
-								truths=true_parameters) 
+lb.mock_test(nproc=8) #run the test case and parallelise over 8 threads
 
-#make a plot of the inference vs. data
-x = np.linspace(np.min(data[:,0]),np.max(data[:,0]))
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.errorbar(data[:,0],data[:,1],xerr=data[:,2],yerr=data[:,3],ecolor='k',fmt='none',alpha=0.5)
-ax.plot(x,true_parameters[0]*x+true_parameters[1],label="truth")
-ax.plot(x,results[:,0][0]*x+results[:,0][1],label="inferred")
-ax.set_xlabel("$x$")
-ax.set_ylabel("$y$")
-ax.legend(loc='upper left')
 ```
 
 ![Alt text](example_fit.png?raw=true)

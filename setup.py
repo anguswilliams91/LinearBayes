@@ -1,6 +1,8 @@
 from setuptools import setup
 
-setup(name='linear_bayes',
+setup(
+	  include_package_data=True,
+	  name='linear_bayes',
       version='0.1',
       description='Bayesian linear regression',
       url='https://github.com/anguswilliams91/LinearBayes',
@@ -8,4 +10,7 @@ setup(name='linear_bayes',
       author_email='anguswilliams91@gmail.com',
       license='MIT',
       packages=['linear_bayes'],
-      zip_safe=False)
+      package_dir={'linear_bayes': 'linear_bayes'},
+      package_data={'linear_bayes': 'data/mock_data.npy'},
+      install_requires = ['numpy','matplotlib','scipy','emcee'],
+	)
