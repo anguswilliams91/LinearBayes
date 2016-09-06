@@ -5,9 +5,9 @@ line to two-dimensional data with covariant errors on the two coordinates and so
 (see e.g. [Hogg, Bovy & Lang (2010)](http://arxiv.org/abs/1008.4686) for discussion). Depends 
 on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
-To install using `pip`, download the zipped repo and run
+To install using `pip`, run
 
-`pip install LinearBayes-master.zip`
+`pip install https://github.com/anguswilliams91/LinearBayes/archive/master.zip`
 
 to install the module (and any dependicies which aren't already installed). The function that 
 does all of the work is called `fit_data` and has an explanatory docstring.
