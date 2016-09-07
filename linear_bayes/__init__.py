@@ -1,1 +1,1 @@
-from .fitter import *
+from .fitter import fit_data

@@ -20,6 +20,8 @@ import matplotlib.colors as colors
 
 warnings.filterwarnings("ignore") #sorry
 
+__all__ = ["fit_data"]
+
 """This code will fit a straight line with intrinsic dispersion to data with (optionally) covariant 
 errors on both the independent and dependent variables, and takes care of outliers using a mixture 
 model approach. Requires packages numpy,scipy,emcee and matplotlib.

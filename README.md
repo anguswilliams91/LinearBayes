@@ -5,12 +5,15 @@ line to two-dimensional data with covariant errors on the two coordinates and so
 (see e.g. [Hogg, Bovy & Lang (2010)](http://arxiv.org/abs/1008.4686) for discussion). Depends 
 on `numpy`, `scipy`, `matplotlib` and [`emcee`](https://github.com/dfm/emcee).
 
-To install using `pip`, run
+If you already possess the required modules, install by running
 
-`pip install https://github.com/anguswilliams91/LinearBayes/archive/master.zip`
+`pip install --no-deps https://github.com/anguswilliams91/LinearBayes/archive/master.zip`
 
-to install the module (and any dependicies which aren't already installed). The function that 
-does all of the work is called `fit_data` and has an explanatory docstring.
+to install the module. If you don't have `emcee` installed, but have `numpy`, `scipy` and 
+`matplotlib` installed, then I recommend installing `emcee` separately (instead of removing 
+the `--no-deps` flag) to avoid updating the other three modules (which will take a while). 
+
+The function that does all of the work is called `fit_data` and has an explanatory docstring.
 
 Example snippet, which runs a test on some mock data and produces two plots (shown below):
 
